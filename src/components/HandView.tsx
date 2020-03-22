@@ -14,11 +14,11 @@ interface HandViewProp {
   onMove: OnMove
 }
 
-export const HandView: React.FC<HandViewProp> = ({ cardWidth, hand, onMove, playerId }) => (
+export const HandView: React.FC<HandViewProp> = ({ cardWidth, hand, onMove }) => (
   <div className="hand-horizontal">
     {hand.map(card => (
       <div key={`${card.faceValue}-${card.suit}`} style={{ marginLeft: -cardWidth * 0.7 }}>
-        <CardView card={card} width={cardWidth} onClick={card => onMove(playerId)(Moves.createDiscardCardMove(card))} />
+        <CardView card={card} width={cardWidth} onClick={card => card && onMove(Moves.createDiscardCardMove(card))} />
       </div>
     ))}
   </div>

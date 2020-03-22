@@ -6,6 +6,10 @@ export const emptyCard = require("./cards/card-empty.png")
 export const emptyFaceDown = require("./cards/card-facedown.png")
 
 const cardImages: indexed  = {
+  card1C: require("./cards/1C.svg"),
+  card1D: require("./cards/1D.svg"),
+  card1H: require("./cards/1H.svg"),
+  card1S: require("./cards/1S.svg"),
   card10C: require("./cards/10C.svg"),
   card10D: require("./cards/10D.svg"),
   card10H: require("./cards/10H.svg"),
@@ -22,10 +26,6 @@ const cardImages: indexed  = {
   card13D: require("./cards/13D.svg"),
   card13H: require("./cards/13H.svg"),
   card13S: require("./cards/13S.svg"),
-  card14C: require("./cards/14C.svg"),
-  card14D: require("./cards/14D.svg"),
-  card14H: require("./cards/14H.svg"),
-  card14S: require("./cards/14S.svg"),
   card2C: require("./cards/2C.svg"),
   card2D: require("./cards/2D.svg"),
   card2H: require("./cards/2H.svg"),

@@ -33,7 +33,7 @@ const TableView2: React.FC<TableView2Props> = ({ game, onMove }) => {
       </div>
       <div className="mid-row">
         <div className="mid-row-trick">
-          <DeckView discardPile={game.discardPile} playerId={bottomPlayer.id} onMove={onMove} cardWidth={cardWidth} />
+          <DeckView discardPile={game.discardPile} onMove={onMove} cardWidth={cardWidth} />
         </div>
       </div>
       <div className="bottom-row">

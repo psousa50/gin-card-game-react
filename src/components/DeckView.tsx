@@ -1,41 +1,27 @@
-import React from "react";
-import * as Moves from "../gin-card-game/Moves/domain";
-import { CardView } from "./CardView";
-import { Card } from "../gin-card-game/Cards/model";
-import { OnMove } from "../models";
-import { PlayerId } from "../gin-card-game/Players/model";
-import { MoveType } from "../gin-card-game/Moves/model";
+import React from "react"
+import * as Moves from "../gin-card-game/Moves/domain"
+import { CardView } from "./CardView"
+import { Card } from "../gin-card-game/Cards/model"
+import { OnMove } from "../models"
+import { MoveType } from "../gin-card-game/Moves/model"
 
-require("./DeckView.css");
+require("./DeckView.css")
 
 interface DeckViewProps {
-  discardPile: Card[];
-  playerId: PlayerId;
-  onMove: OnMove;
-  cardWidth: number;
+  discardPile: Card[]
+  onMove: OnMove
+  cardWidth: number
 }
 
-export const DeckView: React.FC<DeckViewProps> = ({
-  discardPile,
-  onMove,
-  playerId,
-  cardWidth
-}) => (
+export const DeckView: React.FC<DeckViewProps> = ({ discardPile, onMove, cardWidth }) => (
   <div className="deck">
     <div className="cards">
-      <CardView
-        width={cardWidth}
-        onClick={() => onMove(playerId)(Moves.create(MoveType.DrawCard))}
-      />
+      <CardView width={cardWidth} onClick={() => onMove(Moves.create(MoveType.DrawCard))} />
     </div>
     {discardPile.length > 0 ? (
       <div className="cards">
-        <CardView
-          card={discardPile[0]}
-          width={cardWidth}
-          onClick={() => onMove(playerId)(Moves.create(MoveType.PickCard))}
-        />
+        <CardView card={discardPile[0]} width={cardWidth} onClick={() => onMove(Moves.create(MoveType.PickCard))} />
       </div>
     ) : null}
   </div>
-);
+)

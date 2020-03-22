@@ -13,11 +13,11 @@ export const getHeight = (width: number) => aspectRatio * width
 interface CardViewProps {
   card?: Card
   width: number
-  onClick?: (card: Card) => void
+  onClick?: (card?: Card) => void
 }
 
 export const CardView: React.FC<CardViewProps> = ({ card, onClick, width }) => (
-  <div className="card" onClick={() => onClick && card && onClick(card)}>
+  <div className="card" onClick={() => onClick && onClick(card)}>
     <img width={width} height={getHeight(width)} src={card ? getCardImages(card) : emptyFaceDown} alt=""></img>
   </div>
 )

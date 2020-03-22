@@ -6,11 +6,12 @@ import * as Decks from "../gin-card-game/Deck/domain"
 import { TableView } from "./TableView"
 import { PlayerEvent, PlayerEventType } from "../gin-card-game/Events/model"
 import { findBestMove } from "../gin-card-game/AI/mcts"
-import { randomElement } from "../gin-card-game/utils/misc"
+import { randomElement, lj } from "../gin-card-game/utils/misc"
 import { getEitherRight, GameResult } from "../gin-card-game/utils/actions"
 import { buildEnvironment } from "../gin-card-game/Environment/domain"
 import { Move } from "../gin-card-game/Moves/model"
 import { OnMove } from "../models"
+import { PlayerId } from "../gin-card-game/Players/model"
 
 require("./GameView.css")
 
@@ -35,7 +36,7 @@ const play: PlayFunctions = {
   [PlayerType.MCTS]: mctsMove,
 }
 
-const p1 = Players.create("p1", "Player 1", PlayerType.MCTS)
+const p1 = Players.create("p1", "Player 1", PlayerType.Human)
 const p2 = Players.create("p2", "Player 2", PlayerType.MCTS)
 const players = [p1, p2]
 
@@ -59,22 +60,26 @@ export const GameView = () => {
   //   return () => clearTimeout(timer)
   // })
 
-  const mergeState = (newState: Partial<GameState>) => {
-    setGameState(state => ({ ...state, ...newState }))
-  }
-  const setGame = (game: GameResult) => {
-    mergeState({ game: getEitherRight(game(buildEnvironment())) })
-  }
+  // const mergeState = (newState: Partial<GameState>) => {
+  //   setGameState(state => ({ ...state, ...newState }))
+  // }
+
+  const getGame = (gameResult: GameResult) => getEitherRight(gameResult(buildEnvironment()))
 
   const startGame = () => {
     const deck = Decks.create()
-    const game = Games.act(Games.create(players, deck))(Games.start)
-    setGame(game)
+    const game = getGame(Games.act(Games.create(players, deck))(Games.start))
+    setGameState({ game, error: "" })
   }
 
-  const doMove: OnMove = playerId => move => {
-    gameState.game && move && setGame(Games.act(gameState.game)(Games.play(playerId, move)))
+  const doMove = (playerId: PlayerId) => (move: Move) => {
+    setGameState(state => ({
+      ...state,
+      game: state.game && move && getGame(Games.act(state.game)(Games.extractEvents, Games.play(playerId, move))),
+    }))
   }
+
+  const onMove: OnMove = move => gameState.game && doMove(Games.currentPlayer(gameState.game).id)(move)
 
   const processEvent = (event: PlayerEvent) => {
     switch (event.type) {
@@ -88,7 +93,10 @@ export const GameView = () => {
   const processEvents = (events: PlayerEvent[]) => events.forEach(processEvent)
 
   const nextPlay = () => {
-    gameState.game && processEvents(gameState.game.events)
+    gameState.game &&
+      processEvents(
+        gameState.game.events.filter(e => gameState.game && e.target === Games.currentPlayer(gameState.game).id),
+      )
   }
 
   return (
@@ -97,7 +105,7 @@ export const GameView = () => {
       <button onClick={nextPlay}>{"PLAY"}</button>
       <div>{gameState.error}</div>
       <div>{gameState.game ? Games.currentPlayer(gameState.game).name : ""}</div>
-      <TableView game={gameState.game} onMove={doMove} />
+      <TableView game={gameState.game} onMove={onMove} />
     </div>
   )
 }
