@@ -1,0 +1,55 @@
+.table {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  position: relative;
+  background-color: green;
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.topRow {
+  position: absolute;
+  top: 0%;
+  left: 80px;
+  right: 20px;
+  height: 20%;
+}
+
+.mid-row {
+  position: absolute;
+  top: 20%;
+  left: 20px;
+  right: 20px;
+  height: 60%;
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
+
+.mid-row-trick {
+  flex: 1;
+  justify-content: center;
+}
+
+.mid-row-left {
+  position: absolute;
+  top: 0%;
+  left: 10%;
+}
+
+.mid-row-right {
+  position: absolute;
+  top: 0%;
+  right: 10%;
+}
+
+.bottom-row {
+  position: absolute;
+  top: 80%;
+  left: 80px;
+  right: 20px;
+  height: 20%;
+}
