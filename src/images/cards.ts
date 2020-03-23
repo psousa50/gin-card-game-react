@@ -3,7 +3,7 @@ import { Card } from "../gin-card-game/Cards/model"
 type indexed = { [k: string]: string }
 
 export const emptyCard = require("./cards/card-empty.png")
-export const emptyFaceDown = require("./cards/card-facedown.png")
+export const faceDownCard = require("./cards/card-facedown.png")
 
 const cardImages: indexed  = {
   card1C: require("./cards/1C.svg"),

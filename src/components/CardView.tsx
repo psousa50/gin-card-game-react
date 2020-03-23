@@ -1,6 +1,6 @@
 import React from "react"
 import { Card } from "../gin-card-game/Cards/model"
-import { getCardImages, emptyFaceDown } from "../images/cards"
+import { getCardImages, faceDownCard, emptyCard } from "../images/cards"
 
 require ("./CardView.css")
 
@@ -12,12 +12,13 @@ export const getHeight = (width: number) => aspectRatio * width
 
 interface CardViewProps {
   card?: Card
+  faceDown? : boolean
   width: number
   onClick?: (card?: Card) => void
 }
 
-export const CardView: React.FC<CardViewProps> = ({ card, onClick, width }) => (
+export const CardView: React.FC<CardViewProps> = ({ card, faceDown, onClick, width }) => (
   <div className="card" onClick={() => onClick && onClick(card)}>
-    <img width={width} height={getHeight(width)} src={card ? getCardImages(card) : emptyFaceDown} alt=""></img>
+    <img width={width} height={getHeight(width)} src={card ? getCardImages(card) : faceDown ? faceDownCard : emptyCard} alt=""></img>
   </div>
 )

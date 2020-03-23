@@ -51,28 +51,25 @@ export const GameView = () => {
     error: "",
   })
 
-  // React.useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     if (gameState.game && gameState.game.stage === GameModel.GameStage.Playing) {
-  //       nextPlay()
-  //     }
-  //   }, 100)
-  //   return () => clearTimeout(timer)
-  // })
-
-  // const mergeState = (newState: Partial<GameState>) => {
-  //   setGameState(state => ({ ...state, ...newState }))
-  // }
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      if (gameState.game && gameState.game.stage === GameModel.GameStage.Playing) {
+        nextPlay()
+      }
+    }, 100)
+    return () => clearTimeout(timer)
+  })
 
   const getGame = (gameResult: GameResult) => getEitherRight(gameResult(buildEnvironment()))
 
   const startGame = () => {
-    const deck = Decks.create()
+    const deck = Decks.shuffle(Decks.create())
     const game = getGame(Games.act(Games.create(players, deck))(Games.start))
     setGameState({ game, error: "" })
   }
 
   const doMove = (playerId: PlayerId) => (move: Move) => {
+    lj("MOVE", { player: playerId, move })
     setGameState(state => ({
       ...state,
       game: state.game && move && getGame(Games.act(state.game)(Games.extractEvents, Games.play(playerId, move))),

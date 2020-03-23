@@ -16,12 +16,11 @@ interface DeckViewProps {
 export const DeckView: React.FC<DeckViewProps> = ({ discardPile, onMove, cardWidth }) => (
   <div className="deck">
     <div className="cards">
-      <CardView width={cardWidth} onClick={() => onMove(Moves.create(MoveType.DrawCard))} />
+      <CardView width={cardWidth} faceDown={true} onClick={() => onMove(Moves.create(MoveType.DrawCard))} />
     </div>
-    {discardPile.length > 0 ? (
-      <div className="cards">
-        <CardView card={discardPile[0]} width={cardWidth} onClick={() => onMove(Moves.create(MoveType.PickCard))} />
-      </div>
-    ) : null}
+    <div className="cards">
+      <CardView card={discardPile[0]} width={cardWidth} onClick={() => onMove(Moves.create(MoveType.PickCard))} />
+    </div>
+    <button onClick={() => onMove(Moves.create(MoveType.Pass))}>{"PASS"}</button>
   </div>
 )
