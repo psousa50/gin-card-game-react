@@ -5,7 +5,7 @@ import * as Games from "../gin-card-game/Game/domain"
 import * as Decks from "../gin-card-game/Deck/domain"
 import { TableView } from "./TableView"
 import { PlayerEvent, PlayerEventType } from "../gin-card-game/Events/model"
-import { findBestMove } from "../gin-card-game/AI/mcts"
+import * as MCTS  from "../gin-card-game/AI/mcts"
 import { randomElement, lj } from "../gin-card-game/utils/misc"
 import { getEitherRight, GameResult } from "../gin-card-game/utils/actions"
 import { buildEnvironment } from "../gin-card-game/Environment/domain"
@@ -23,7 +23,7 @@ enum PlayerType {
 
 const randomMove = (event: PlayerEvent) => randomElement(Games.validMoves(event.game))
 
-const mctsMove = (event: PlayerEvent) => findBestMove(event.game, event.player, { timeLimitMs: 2000 })
+const mctsMove = (event: PlayerEvent) => MCTS.findBestMove(event.game, event.player, { timeLimitMs: 5000 })
 
 type PlayFunction = (event: PlayerEvent) => Move | undefined
 type PlayFunctions = {
@@ -40,43 +40,50 @@ const p1 = Players.create("p1", "Player 1", PlayerType.Human)
 const p2 = Players.create("p2", "Player 2", PlayerType.MCTS)
 const players = [p1, p2]
 
-interface GameState {
-  game: GameModel.Game | undefined
-  error: ""
+interface GameViewState {
+  game: GameModel.Game
 }
 
+const shuffledDeck = () => Decks.shuffle(Decks.create())
+
+const createGame = () => Games.create(players, shuffledDeck())
+
 export const GameView = () => {
-  const [gameState, setGameState] = React.useState<GameState>({
-    game: undefined,
-    error: "",
+  const [gameState, setGameState] = React.useState<GameViewState>({
+    game: createGame(),
   })
+
+  const { game } = gameState
+
+  const getGame = (gameResult: GameResult) => getEitherRight(gameResult(buildEnvironment()))
+
+  const startGame = () => {
+    const game = getGame(Games.act(gameState.game)(Games.restart(shuffledDeck())))
+    setGameState({ game })
+  }
+
+  type GameRunningViewProps = {
+    game: GameModel.Game
+    onGameChanged: (game: GameModel.Game) => void
+  }
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
-      if (gameState.game && gameState.game.stage === GameModel.GameStage.Playing) {
-        nextPlay()
+      if (game.stage === GameModel.GameStage.Playing) {
+        // processEvents()
       }
     }, 100)
     return () => clearTimeout(timer)
   })
 
-  const getGame = (gameResult: GameResult) => getEitherRight(gameResult(buildEnvironment()))
-
-  const startGame = () => {
-    const deck = Decks.shuffle(Decks.create())
-    const game = getGame(Games.act(Games.create(players, deck))(Games.start))
-    setGameState({ game, error: "" })
-  }
-
   const doMove = (playerId: PlayerId) => (move: Move) => {
     lj("MOVE", { player: playerId, move })
     setGameState(state => ({
-      ...state,
-      game: state.game && move && getGame(Games.act(state.game)(Games.extractEvents, Games.play(playerId, move))),
+      game: getGame(Games.act(state.game)(Games.extractEvents, Games.play(playerId, move))),
     }))
   }
 
-  const onMove: OnMove = move => gameState.game && doMove(Games.currentPlayer(gameState.game).id)(move)
+  const onMove: OnMove = move => game && doMove(Games.currentPlayer(game).id)(move)
 
   const processEvent = (event: PlayerEvent) => {
     switch (event.type) {
@@ -87,22 +94,19 @@ export const GameView = () => {
     }
   }
 
-  const processEvents = (events: PlayerEvent[]) => events.forEach(processEvent)
-
-  const nextPlay = () => {
-    gameState.game &&
-      processEvents(
-        gameState.game.events.filter(e => gameState.game && e.target === Games.currentPlayer(gameState.game).id),
-      )
+  const processEvents = () => {
+    game.events.filter(e => game && e.target === Games.currentPlayer(game).id).forEach(processEvent)
   }
 
   return (
     <div className="game">
-      <button onClick={startGame}>{"START"}</button>
-      <button onClick={nextPlay}>{"PLAY"}</button>
-      <div>{gameState.error}</div>
-      <div>{gameState.game ? Games.currentPlayer(gameState.game).name : ""}</div>
-      <TableView game={gameState.game} onMove={onMove} />
+      <div className="actions">
+        <button onClick={startGame}>{"START"}</button>
+        <button onClick={processEvents}>{"PLAY"}</button>
+      </div>
+      {/* <div>{error}</div> */}
+      <div className="player">{Games.currentPlayer(game).name}</div>
+      <TableView game={game} onMove={onMove} />
     </div>
   )
 }

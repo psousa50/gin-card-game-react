@@ -5,3 +5,19 @@
   flex-direction: column;  
   margin: auto;
 }
+
+.actions {
+  display: flex;
+  background-color: turquoise;
+  justify-content: space-around;
+  padding: 20px;
+}
+
+.player {
+  display: flex;
+  flex-direction: column;  
+  text-align: center;
+  color: blue;
+  background-color: turquoise;
+  font-weight: bold;
+}

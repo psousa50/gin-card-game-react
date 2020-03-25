@@ -5,6 +5,8 @@ import { CardView } from "./CardView"
 import { PlayerId } from "../gin-card-game/Players/model"
 import { OnMove } from "../models"
 import { sort } from "ramda"
+import { toSymbol } from "../gin-card-game/Cards/domain"
+import { MeldsView } from "./MeldsView"
 
 require("./HandView.css")
 
@@ -15,15 +17,20 @@ interface HandViewProp {
   onMove: OnMove
 }
 
- const order = (card1: Card, card2: Card) =>
-  card1.faceValue === card2.faceValue ?  suitOrder[card1.suit] - suitOrder[card2.suit] : card1.faceValue - card2.faceValue
+const order = (card1: Card, card2: Card) =>
+  card1.faceValue === card2.faceValue
+    ? suitOrder[card1.suit] - suitOrder[card2.suit]
+    : card1.faceValue - card2.faceValue
 
-  export const HandView: React.FC<HandViewProp> = ({ cardWidth, hand, onMove }) => (
-  <div className="hand-horizontal">
-    {sort(order, hand).map(card => (
-      <div key={`${card.faceValue}-${card.suit}`} style={{ marginLeft: -cardWidth * 0.7 }}>
-        <CardView card={card} width={cardWidth} onClick={card => card && onMove(Moves.createDiscardCardMove(card))} />
-      </div>
-    ))}
+export const HandView: React.FC<HandViewProp> = ({ cardWidth, hand, onMove }) => (
+  <div>
+    <div className="hand-horizontal">
+      {sort(order, hand).map(card => (
+        <div key={toSymbol(card)} style={{ marginLeft: -cardWidth * 0.7 }}>
+          <CardView card={card} width={cardWidth} onClick={card => card && onMove(Moves.createDiscardCardMove(card))} />
+        </div>
+      ))}
+    </div>
+    <MeldsView cardWidth={cardWidth} hand={hand} />
   </div>
 )

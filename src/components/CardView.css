@@ -1,3 +1,7 @@
 .card {
   margin: 1px;
 }
+
+.clip {
+  clip-path: inset(0px 65px 85px 0px); 
+}
