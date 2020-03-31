@@ -1,8 +1,10 @@
 import React from "react"
+import * as Games from "../gin-card-game/Game/domain"
 import { Game } from "../gin-card-game/Game/model"
 import { HandView } from "./HandView"
 import { DeckView } from "./DeckView"
 import { OnMove } from "../models"
+import { MeldsView } from "./MeldsView"
 
 require("./TableView.css")
 
@@ -13,32 +15,31 @@ interface TableViewProps {
 
 const cardWidth = 80
 
-export const TableView: React.FC<TableViewProps> = props => (
-  <div className="table">{props.game ? <TableView2 game={props.game} onMove={props.onMove} /> : null}</div>
-)
+export const TableView: React.FC<TableViewProps> = props =>
+  props.game ? <TableRunningView game={props.game} onMove={props.onMove} /> : null
 
 interface TableView2Props {
   game: Game
   onMove: OnMove
 }
 
-const TableView2: React.FC<TableView2Props> = ({ game, onMove }) => {
+const TableRunningView: React.FC<TableView2Props> = ({ game, onMove }) => {
   const topPlayer = game.players[1]
   const bottomPlayer = game.players[0]
+  const result = Games.result(game)
 
   return (
     <div className="table">
-      <div className="topRow">
-        <HandView playerId={topPlayer.id} hand={topPlayer.hand} cardWidth={cardWidth} onMove={onMove} />
+      <HandView playerId={topPlayer.id} hand={topPlayer.hand} cardWidth={cardWidth} onMove={onMove} />
+      <MeldsView cardWidth={cardWidth} hand={topPlayer.hand} />
+      <DeckView discardPile={game.discardPile} onMove={onMove} cardWidth={cardWidth} />
+      <div>
+        {result.scores.map((s, i) => (
+          <div key={i}>{s}</div>
+        ))}
       </div>
-      <div className="mid-row">
-        <div className="mid-row-trick">
-          <DeckView discardPile={game.discardPile} onMove={onMove} cardWidth={cardWidth} />
-        </div>
-      </div>
-      <div className="bottom-row">
-        <HandView playerId={bottomPlayer.id} hand={bottomPlayer.hand} cardWidth={cardWidth} onMove={onMove} />
-      </div>
+      <HandView playerId={bottomPlayer.id} hand={bottomPlayer.hand} cardWidth={cardWidth} onMove={onMove} />
+      <MeldsView cardWidth={cardWidth} hand={bottomPlayer.hand} />
     </div>
   )
 }

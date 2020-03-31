@@ -5,13 +5,15 @@ import * as Games from "../gin-card-game/Game/domain"
 import * as Decks from "../gin-card-game/Deck/domain"
 import { TableView } from "./TableView"
 import { PlayerEvent, PlayerEventType } from "../gin-card-game/Events/model"
-import * as MCTS  from "../gin-card-game/AI/mcts"
+import * as MCTS from "../gin-card-game/AI/mcts"
 import { randomElement, lj } from "../gin-card-game/utils/misc"
 import { getEitherRight, GameResult } from "../gin-card-game/utils/actions"
 import { buildEnvironment } from "../gin-card-game/Environment/domain"
 import { Move } from "../gin-card-game/Moves/model"
 import { OnMove } from "../models"
 import { PlayerId } from "../gin-card-game/Players/model"
+import { fold } from "fp-ts/lib/Either"
+import { pipe } from "fp-ts/lib/pipeable"
 
 require("./GameView.css")
 
@@ -42,6 +44,7 @@ const players = [p1, p2]
 
 interface GameViewState {
   game: GameModel.Game
+  error: string
 }
 
 const shuffledDeck = () => Decks.shuffle(Decks.create())
@@ -51,6 +54,7 @@ const createGame = () => Games.create(players, shuffledDeck())
 export const GameView = () => {
   const [gameState, setGameState] = React.useState<GameViewState>({
     game: createGame(),
+    error: "",
   })
 
   const { game } = gameState
@@ -59,7 +63,7 @@ export const GameView = () => {
 
   const startGame = () => {
     const game = getGame(Games.act(gameState.game)(Games.restart(shuffledDeck())))
-    setGameState({ game })
+    setGameState({ game, error: "" })
   }
 
   type GameRunningViewProps = {
@@ -78,9 +82,19 @@ export const GameView = () => {
 
   const doMove = (playerId: PlayerId) => (move: Move) => {
     lj("MOVE", { player: playerId, move })
-    setGameState(state => ({
-      game: getGame(Games.act(state.game)(Games.extractEvents, Games.play(playerId, move))),
-    }))
+    setGameState(state => {
+      const result = Games.act(state.game)(Games.extractEvents, Games.play(playerId, move))(buildEnvironment())
+      return pipe(
+        result,
+        fold(
+          e => ({
+            ...state,
+            error: e.type.toString(),
+          }),
+          game => ({ ...state, game: game }),
+        ),
+      )
+    })
   }
 
   const onMove: OnMove = move => game && doMove(Games.currentPlayer(game).id)(move)
@@ -104,7 +118,7 @@ export const GameView = () => {
         <button onClick={startGame}>{"START"}</button>
         <button onClick={processEvents}>{"PLAY"}</button>
       </div>
-      {/* <div>{error}</div> */}
+      <div>{`Error: ${gameState.error}`}</div>
       <div className="player">{Games.currentPlayer(game).name}</div>
       <TableView game={game} onMove={onMove} />
     </div>

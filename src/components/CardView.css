@@ -4,4 +4,6 @@
 
 .clip {
   clip-path: inset(0px 65px 85px 0px); 
+  max-width: 80px;
+  max-height: 120px;
 }

@@ -1,0 +1,22 @@
+.melds {
+  display: flex;
+  flex-direction: column;
+}
+
+.small-cards-list-of-cards {
+  display: flex;
+  flex-direction: row;
+  padding-right: 30px;
+}
+
+
+.small-cards-list {
+  display: flex;
+  max-height: 40px;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.deadwood {
+  color: white;
+}
